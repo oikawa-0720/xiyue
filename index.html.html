@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roquebrune-Cap-Martin | Official Tourism 2026</title>
+    <!-- Elegant Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ----- Global reset & variables ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #F7F5F0;
+            --text-dark: #1A1A1A;
+            --text-muted: #555555;
+            --accent: #8B7355;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 400;
+        }
+
+        /* ----- Navigation ----- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 6%;
+            background: rgba(247, 245, 240, 0.9);
+            backdrop-filter: blur(10px);
+            transition: padding 0.4s ease, box-shadow 0.3s ease;
+        }
+        nav.scrolled {
+            padding: 15px 6%;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        }
+
+        .logo {
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        .logo span {
+            color: var(--accent);
+        }
+
+        .audio-btn {
+            background: none;
+            border: 1px solid var(--text-dark);
+            padding: 8px 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--text-dark);
+        }
+        .audio-btn:hover,
+        .audio-btn.active {
+            background: var(--text-dark);
+            color: var(--bg-color);
+        }
+
+        /* ----- Hero Section (Video Background) ----- */
+        .hero {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+            z-index: 0;
+        }
+        /* Fallback background image if video fails */
+        .hero-video-fallback {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1560703650-ef3e0f254ae0?auto=format&fit=crop&w=1920&q=80') center/cover;
+            filter: brightness(0.7);
+            z-index: 0;
+            display: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        .hero-tag {
+            font-size: 0.75rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        .hero-content h1 {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeUp 1.2s forwards 0.3s;
+        }
+        .hero-content p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: fadeUp 1.2s forwards 0.7s;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ----- Destination Cards (shared) ----- */
+        .destination {
+            display: flex;
+            min-height: 100vh;
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .destination.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .destination:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .dest-image {
+            flex: 1;
+            min-height: 500px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .dest-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(26,26,26,0.05);
+            transition: 0.6s;
+        }
+        .destination:hover .dest-image::after {
+            background: rgba(26,26,26,0.2);
+        }
+
+        .dest-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 10%;
+            background: var(--bg-color);
+        }
+
+        .dest-label {
+            color: var(--accent);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .dest-text h2 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            line-height: 1.15;
+        }
+        .dest-text p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            line-height: 1.9;
+            max-width: 500px;
+        }
+        .dest-text p + p {
+            margin-top: 20px;
+        }
+
+        /* ----- Footer ----- */
+        footer {
+            background: var(--text-dark);
+            color: rgba(255,255,255,0.6);
+            padding: 70px 6% 30px;
+            font-size: 0.8rem;
+            line-height: 2;
+        }
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        .footer-col h4 {
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .footer-col ul {
+            list-style: none;
+        }
+        .footer-col ul li {
+            margin-bottom: 6px;
+        }
+
+        .bottom-bar {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .student-id {
+            font-style: italic;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        /* ----- Responsive ----- */
+        @media (max-width: 900px) {
+            .destination,
+            .destination:nth-child(even) {
+                flex-direction: column;
+            }
+            .dest-image {
+                min-height: 40vh;
+                width: 100%;
+            }
+            .dest-text {
+                padding: 50px 8%;
+            }
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+            .dest-text h2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 0.9rem;
+                letter-spacing: 2px;
+            }
+            .audio-btn {
+                padding: 5px 12px;
+                font-size: 0.55rem;
+            }
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="logo">Roquebrune <span>2026</span></div>
+        <button class="audio-btn" id="audioToggle">♪ Ambient Sound</button>
+    </nav>
+
+    <!-- Background Audio (direct link inserted) -->
+    <audio id="ambientAudio" loop preload="none">
+        <source src="https://aka.doubaocdn.com/s/jfBu1wfCIR" type="audio/mpeg">
+    </audio>
+
+    <!-- Hero Section with Video Background -->
+    <section class="hero">
+        <!-- Video element with poster/cover -->
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata">
+            <source src="https://aka.doubaocdn.com/s/fGxu1wfCct" type="video/mp4">
+            <!-- Fallback: if video fails, show static image -->
+            Your browser does not support the video tag.
+        </video>
+        <!-- Fallback background image (hidden by default, shown if video fails via JS) -->
+        <div class="hero-video-fallback" id="videoFallback"></div>
+        
+        <div class="hero-content">
+            <div class="hero-tag">French Riviera · Season 2026</div>
+            <h1>A Sanctuary of Timeless Elegance</h1>
+            <p>Immerse yourself in the unparalleled beauty of Roquebrune-Cap-Martin, where medieval heritage, botanical wonders, and the Mediterranean azure converge.</p>
+        </div>
+    </section>
+
+    <!-- Destination 1: Le Château & Bistrot (Image 3) -->
+    <section class="destination">
+        <div class="dest-image" style="background-image: url('https://i.ibb.co/WZCX4rT/3.jpg');"></div>
+        <div class="dest-text">
+            <div class="dest-label">Heritage & Gastronomy</div>
+            <h2>Côté Bistrot de la Roquebrunoise</h2>
+            <p>Perched majestically above the village, the 10th-century Château de Roquebrune stands as a silent guardian of history. Within its ancient, sun-warmed stone walls lies the Côté Bistrot de la Roquebrunoise, a culinary haven that celebrates the authentic flavors of Provence.</p>
+            <p>Dining here is an immersive journey through time. Guests are invited to savor locally sourced Mediterranean delicacies while gazing out over terracotta rooftops and the shimmering coastline below, experiencing the true essence of Riviera hospitality.</p>
+        </div>
+    </section>
+
+    <!-- Destination 2: Èze Botanical Garden (Image 1) -->
+    <section class="destination">
+        <div class="dest-image" style="background-image: url('https://i.ibb.co/LDj27TRj/1.jpg');"></div>
+        <div class="dest-text">
+            <div class="dest-label">Botanical Sanctuary</div>
+            <h2>The Exotic Garden of Èze</h2>
+            <p>Suspended between earth and sky, the Jardin Exotique d'Èze is a breathtaking landscape masterpiece. Clinging to the steep limestone cliffs at 400 meters above sea level, this sanctuary hosts over a thousand species of succulents and cacti from around the globe.</p>
+            <p>Wandering its winding, shaded pathways offers a surreal experience where desert flora contrasts dramatically with the endless blue of the Mediterranean. It is a place of profound tranquility, offering panoramic vistas that stretch from Monaco to the Italian border.</p>
+        </div>
+    </section>
+
+    <!-- Destination 3: Beautiful Sea View (Image 2) -->
+    <section class="destination">
+        <div class="dest-image" style="background-image: url('https://i.ibb.co/d0rTY3FX/2.jpg');"></div>
+        <div class="dest-text">
+            <div class="dest-label">Coastal Serenity</div>
+            <h2>The Azure Horizon</h2>
+            <p>The coastline of Roquebrune-Cap-Martin is a masterclass in Mediterranean beauty. From the sun-dappled pebbled shores of Carnolès to the secluded, pine-fringed coves near Le Corbusier's Cabanon, the sea here paints a living canvas of turquoise and sapphire.</p>
+            <p>The renowned Sentier du Littoral provides an intimate coastal walk where ancient pine trees meet the rhythmic waves. This pristine shoreline has long served as a muse for modernist architects and impressionist painters, offering visitors a profound connection to nature's raw elegance.</p>
+        </div>
+    </section>
+
+    <!-- Footer & References -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h4>Academic References</h4>
+                <ul>
+                    <li>1. UNESCO World Heritage Centre. (2016). <em>Le Corbusier's Cabanon.</em></li>
+                    <li>2. Mairie de Roquebrune-Cap-Martin. (2024). <em>Le Château de Roquebrune.</em></li>
+                    <li>3. Conseil Départemental des Alpes-Maritimes. (2023). <em>Sentier du Littoral.</em></li>
+                    <li>4. PACA Tourisme. (2024). <em>Roquebrune-Cap-Martin.</em></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Destination Focus</h4>
+                <ul>
+                    <li>Purely Scenic & Cultural Exploration</li>
+                    <li>Curated for the Discerning Traveler</li>
+                    <li>Preserving Natural & Historical Heritage</li>
+                </ul>
+            </div>
+        </div>
+        <div class="bottom-bar">
+            <span>&copy; 2026 Roquebrune-Cap-Martin Official Tourism Board. All Rights Reserved.</span>
+            <span class="student-id">Qiyue Zhang 2300880132</span>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // 1. Scroll reveal animation (Intersection Observer)
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.destination').forEach(el => observer.observe(el));
+
+            // 2. Navbar scroll effect
+            const nav = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+
+            // 3. Audio Toggle (using direct link)
+            const audioBtn = document.getElementById('audioToggle');
+            const audio = document.getElementById('ambientAudio');
+            let isPlaying = false;
+
+            audioBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (isPlaying) {
+                    audio.pause();
+                    audioBtn.textContent = '♪ AMBIENT SOUND';
+                    audioBtn.classList.remove('active');
+                } else {
+                    audio.play().catch(() => {});
+                    audioBtn.textContent = '■ MUTE SOUND';
+                    audioBtn.classList.add('active');
+                }
+                isPlaying = !isPlaying;
+            });
+
+            audio.addEventListener('ended', function() {
+                if (isPlaying) {
+                    audio.play().catch(() => {});
+                }
+            });
+
+            // 4. Video fallback: if video fails to load, show static image
+            const video = document.querySelector('.hero-video');
+            const fallback = document.getElementById('videoFallback');
+            
+            video.addEventListener('error', function() {
+                // Hide video and show fallback image
+                video.style.display = 'none';
+                fallback.style.display = 'block';
+            });
+
+            // Also, if video can't play due to unsupported format, show fallback
+            // This is a safety net
+            setTimeout(() => {
+                if (video.readyState === 0) {
+                    // Video not loaded after a short time, show fallback
+                    video.style.display = 'none';
+                    fallback.style.display = 'block';
+                }
+            }, 3000);
+        })();
+    </script>
+
+</body>
+</html>
